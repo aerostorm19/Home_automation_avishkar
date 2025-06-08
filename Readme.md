@@ -1,77 +1,96 @@
-# 🔌 Home Automation with ESP32 and Blynk
+# ESP32 Home Automation System with Blynk and Voice Control
 
-A smart home automation system using ESP32 and Blynk IoT platform, allowing you to control electrical devices via mobile app and physical switches, with dimmer support for fan control.
+## Overview
+This project creates a smart home system using ESP32 for:
+- Remote control via Blynk app/web dashboard
+- Physical switch integration
+- Voice commands via Dialogflow
+- AC fan dimming with zero-cross detection
+- 4-channel relay control
+
+```mermaid
+graph TD
+    A[User Interface] -->|Commands| B(Blynk Cloud)
+    B --> C(ESP32 Microcontroller)
+    C --> D1[Relay 1]
+    C --> D2[Relay 2]
+    C --> D3[Relay 3]
+    C --> D4[Relay 4]
+    C --> E[Fan Dimmer]
+    F[Voice Assistant] -->|HTTP Requests| B
+    G[Physical Buttons] --> C
+
+    ### Hardware Components
+
+| Component      | GPIO Pin | Function                  |
+|----------------|----------|---------------------------|
+| Relay 1        | GPIO1    | Appliance control         |
+| Relay 2        | GPIO2    | Appliance control         |
+| Relay 3        | GPIO3    | Appliance control         |
+| Relay 4        | GPIO4    | Appliance control         |
+| Button 1       | GPIO7    | Manual toggle             |
+| Button 2       | GPIO8    | Manual toggle             |
+| Button 3       | GPIO9    | Manual toggle             |
+| Button 4       | GPIO10   | Manual toggle             |
+| Fan Dimmer     | GPIO11   | AC fan speed control      |
+| Zero-Cross Det.| GPIO13   | AC waveform detection     |
+| LED Dimmer     | GPIO12   | (Reserved for future)     |
+
+
+### Blynk Virtual Pins
+
+| Virtual Pin | Component   | Control Type |
+|-------------|-------------|--------------|
+| V1          | Relay 1     | Switch       |
+| V2          | Relay 2     | Switch       |
+| V3          | Relay 3     | Switch       |
+| V4          | Relay 4     | Switch       |
+| V11         | Fan         | Slider       |
+| V12         | LED Dimmer  | Slider       |
+
+### Key Features
+
+#### Multi-Control Interface
+- Blynk app/web dashboard  
+- Physical push buttons  
+- Voice commands  
+
+#### Real-time Synchronization
+- State sync on Blynk connection  
+- Instant cloud updates  
+
+#### Safe AC Dimming
+- Zero-cross detection  
+- Phase-angle control  
+
+#### Voice Control Integration
+- Dialogflow NLP processing  
+- HTTP webhook to Blynk  
+
 
 ---
 
-## 🧰 Features
-
-- Control 4 relays via:
-  - Blynk App (Android/iOS)
-  - Physical push buttons
-- Fan speed control using AC dimmer with zero-crossing detection
-- Real-time relay status sync between hardware and app
-- Modular, beginner-friendly code
-- Internet-based wireless control with ESP32
+# Setup Instructions
 
 ---
 
-## 📦 Hardware Required
+## Hardware Assembly
 
-| Component                    | Quantity  |
-|------------------------------|-----------|
-| ESP32 Dev Board              | 1         |
-| 4-Channel Relay Module       | 1         |
-| AC Dimmer with ZVC support   | 1         |
-| Push Buttons                 | 4         |
-| Wires, Breadboard, etc.      | As needed |
-| Power Source (5V for ESP32)  | 1         |
+- Connect **relays** to appliances  
+- Install **zero-cross detector** circuit  
+- Wire **buttons** with **pull-up resistors**
 
 ---
 
-## 🔌 Pin Configuration
+## 📱 Blynk Configuration
+graph LR
+    A[Create Blynk Template] --> B[Add 4 Switch Widgets]
+    B --> C[Add 2 Slider Widgets]
+    C --> D[Bind to V1-V4/V11-V12]
 
-| Function             | ESP32 GPIO |
-|----------------------|------------|
-| Relay 1 Control      | 1          |
-| Relay 2 Control      | 2          |
-| Relay 3 Control      | 3          |
-| Relay 4 Control      | 4          |
-| Button 1             | 7          |
-| Button 2             | 8          |
-| Button 3             | 9          |
-| Button 4             | 10         |
-| Fan Dimmer Output    | 11         |
-| LED Dimmer Output    | 12         |
-| ZVC Input            | 13         |
-
-> **Note**: Use appropriate GPIOs for your ESP32 board; not all boards map GPIO numbers the same way.
-
----
-
-## 📲 Blynk Configuration
-
-1. Go to [Blynk IoT Console](https://blynk.cloud/)
-2. Create a new Template with:
-   - **Template ID**: `TMPL3Y7reHYvw`
-   - **Device Name**: `Home automation avishkar`
-3. Create virtual pins on the dashboard:
-   - V1 → Relay 1 Switch
-   - V2 → Relay 2 Switch
-   - V3 → Relay 3 Switch
-   - V4 → Relay 4 Switch
-   - V11 → Fan Dimmer Slider
-   - V12 → *(reserved for LED dimmer)*
-
----
-
-## 🔧 Setup Instructions
-
-1. Replace the following credentials in code:
-   ```cpp
-   #define BLYNK_TEMPLATE_ID "Your_Template_ID"
-   #define BLYNK_TEMPLATE_NAME "Your_Template_Name"
-   #define BLYNK_AUTH_TOKEN "Your_Auth_Token"
-
-   char ssid[] = "Your_WiFi_Name";
-   char pass[] = "Your_WiFi_Password";
+### 💻 Code
+```cpp
+char ssid[] = "Your_SSID";
+char pass[] = "Your_PASSWORD";
+Blynk.begin(auth, ssid, pass);
+// Establishes secure connection to WiFi and Blynk cloud
